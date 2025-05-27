@@ -17,6 +17,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
+import Link from 'next/link'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -103,8 +104,13 @@ export default function AppHeader() {
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem >
+        <Link href={'profile'} style={{
+          color:'unset',
+          textDecoration:'none'
+        }}>Profile</Link>
+      </MenuItem>
+      <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
     </Menu>
   );
 
@@ -195,11 +201,15 @@ export default function AppHeader() {
               display: { xs: 'none', md: 'flex' },
               alignItems: 'center',
               gap: '20px',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              "> a":{
+                color:'unset',
+                textDecoration: 'none',
+              }
             }}>
-              <span>PlayList</span>
-              <span>Likes</span>
-              <span>Upload</span>
+              <Link href={'/playlist'}>PlayLists</Link>
+              <Link href={'/like'}>Likes</Link>
+              <Link href={'/'}>Upload</Link>
               <Avatar
                 onClick={handleProfileMenuOpen}
               >
