@@ -18,6 +18,7 @@ import MoreIcon from '@mui/icons-material/MoreVert';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
@@ -62,6 +63,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function AppHeader() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const router = useRouter()
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] =
     React.useState<null | HTMLElement>(null);
 
@@ -106,8 +108,8 @@ export default function AppHeader() {
     >
       <MenuItem >
         <Link href={'profile'} style={{
-          color:'unset',
-          textDecoration:'none'
+          color: 'unset',
+          textDecoration: 'none'
         }}>Profile</Link>
       </MenuItem>
       <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
@@ -181,7 +183,12 @@ export default function AppHeader() {
               variant="h6"
               noWrap
               component="div"
-              sx={{ display: { xs: 'none', sm: 'block' } }}
+              sx={{
+                display: { xs: 'none', sm: 'block' },
+                cursor: 'pointer',
+              }}
+              onClick={() => router.push('/')}
+
             >
               SoundCloud
             </Typography>
@@ -202,8 +209,8 @@ export default function AppHeader() {
               alignItems: 'center',
               gap: '20px',
               cursor: 'pointer',
-              "> a":{
-                color:'unset',
+              "> a": {
+                color: 'unset',
                 textDecoration: 'none',
               }
             }}>
