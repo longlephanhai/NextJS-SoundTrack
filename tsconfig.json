@@ -35,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-  ],
+, "src/utils/old.api.js"  ],
   "exclude": [
     "node_modules"
   ]
