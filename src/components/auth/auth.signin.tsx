@@ -7,7 +7,7 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
-
+import { getProviders, signIn } from "next-auth/react"
 import { useState } from "react";
 
 const AuthSignIn = (props: any) => {
@@ -144,6 +144,7 @@ const AuthSignIn = (props: any) => {
                                     cursor: "pointer",
                                     bgcolor: "orange"
                                 }}
+                                onClick={() => signIn("github")}
                             >
                                 <GitHubIcon titleAccess="Login with Github" />
                             </Avatar>
