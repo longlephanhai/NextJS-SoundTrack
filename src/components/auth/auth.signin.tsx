@@ -1,5 +1,5 @@
 'use client'
-import { Avatar, Box, Button, Divider, Grid, TextField, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Divider, Grid, Snackbar, TextField, Typography } from "@mui/material";
 import LockIcon from '@mui/icons-material/Lock';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
@@ -29,6 +29,9 @@ const AuthSignIn = (props: any) => {
 
     const router = useRouter()
 
+    const [openMessage, setOpenMessage] = useState<boolean>(false);
+    const [resMessage, setResMessage] = useState<string>("");
+
 
     const handleSubmit = async () => {
         setIsErrorUsername(false);
@@ -54,7 +57,8 @@ const AuthSignIn = (props: any) => {
         if (!res?.error) {
             router.push('/')
         } else {
-
+            setOpenMessage(true);
+            setResMessage(res.error);
         }
     }
 
@@ -107,6 +111,11 @@ const AuthSignIn = (props: any) => {
 
                         <TextField
                             onChange={(event) => setUsername(event.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    handleSubmit()
+                                }
+                            }}
                             variant="outlined"
                             margin="normal"
                             required
@@ -181,6 +190,18 @@ const AuthSignIn = (props: any) => {
                 </Grid>
             </Grid>
 
+            <Snackbar
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center'
+                }}
+                open={openMessage}
+                // autoHideDuration={5000}
+            >
+                <Alert onClose={() => setOpenMessage(false)} severity="error" sx={{ width: '100%' }}>
+                    {resMessage}
+                </Alert>
+            </Snackbar>
         </Box>
 
     )
