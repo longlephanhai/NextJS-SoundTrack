@@ -48,4 +48,47 @@ declare global {
         },
         result: T[]
     }
+
+    interface IShareTrack extends ITrackTop {
+        isPlaying: boolean;
+    }
+
+    interface ITrackContext {
+        currentTrack: IShareTrack;
+        setCurrentTrack: (v: IShareTrack) => void;
+    }
+
+    interface ITrackComment {
+        _id: string;
+        content: string;
+        moment: number;
+        user: {
+            _id: string;
+            email: string;
+            name: string;
+            role: string;
+            type: string
+        },
+        track: {
+            _id: string;
+            title: string;
+            description: string;
+            trackUrl: string
+        },
+        isDeleted: boolean;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    interface ITrackLike {
+        _id: string;
+        title: string;
+        description: string;
+        imgUrl: string;
+        trackUrl: string;
+        countLike: number;
+        countPlay: number;
+        createdAt: string;
+        updatedAt: string;
+    }
 }

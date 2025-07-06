@@ -20,6 +20,8 @@ import Avatar from '@mui/material/Avatar';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from "next-auth/react"
+import { fetchDefaultImages } from '@/utils/api';
+import Image from 'next/image';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -110,7 +112,7 @@ export default function AppHeader() {
       onClose={handleMenuClose}
     >
       <MenuItem >
-        <Link href={'profile'} style={{
+        <Link href={`/profile/${session?.user?._id}`} style={{
           color: 'unset',
           textDecoration: 'none'
         }}>Profile</Link>
@@ -225,12 +227,19 @@ export default function AppHeader() {
                   <>
                     <Link href={'/playlist'}>PlayLists</Link>
                     <Link href={'/like'}>Likes</Link>
-                    <Link href={'/'}>Upload</Link>
-                    <Avatar
+                    <Link href={'/track/upload'}>Upload</Link>
+                    <Image
+                      src={fetchDefaultImages(session.user.type)}
+                      alt="avatar"
+                      onClick={handleProfileMenuOpen}
+                      height={35}
+                      width={35}
+                    />
+                    {/* <Avatar
                       onClick={handleProfileMenuOpen}
                     >
                       L
-                    </Avatar>
+                    </Avatar> */}
                   </>
                   :
                   <>

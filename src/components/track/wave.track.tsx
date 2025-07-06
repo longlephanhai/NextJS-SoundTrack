@@ -1,22 +1,37 @@
 'use client'
 
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useWavesurfer } from "@/utils/customHook";
 import { WaveSurferOptions } from 'wavesurfer.js';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import './wave.scss';
 import { Tooltip } from "@mui/material";
+import { fetchDefaultImages, sendRequest } from "@/utils/api";
+import { useTrackContext } from "@/lib/track.wrapper";
+import CommentTrack from "./comment.track";
+import LikeTrack from "./like.track";
+import Image from "next/image";
 
-const WaveTrack = () => {
+interface IProps {
+  track: ITrackTop | null;
+  comments?: ITrackComment[];
+}
+const WaveTrack = (props: IProps) => {
+  const { track, comments } = props;
+  const router = useRouter()
+  const firstViewRef = useRef(true)
   const searchParams = useSearchParams()
   const fileName = searchParams.get('audio');
+
   const containerRef = useRef<HTMLDivElement>(null);
   const hoverRef = useRef<HTMLDivElement>(null);
 
   const [time, setTime] = useState<string>("0:00");
   const [duration, setDuration] = useState<string>("0:00");
+
+  const { currentTrack, setCurrentTrack } = useTrackContext() as ITrackContext;
 
 
   const optionsMemo = useMemo((): Omit<WaveSurferOptions, 'container'> => {
@@ -54,6 +69,7 @@ const WaveTrack = () => {
   const wavesurfer = useWavesurfer(containerRef, optionsMemo);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
+
   // Initialize wavesurfer when the container mounts
   // or any of the props change
   useEffect(() => {
@@ -82,6 +98,7 @@ const WaveTrack = () => {
       subscriptions.forEach((unsub) => unsub())
     }
   }, [wavesurfer])
+
 
   // On play button click
   const onPlayClick = useCallback(() => {
@@ -122,11 +139,37 @@ const WaveTrack = () => {
   ]
 
   const calLeft = (moment: number) => {
-    const hardCodeDuration = 199;
+    const hardCodeDuration = wavesurfer?.getDuration() ?? 0;
     const percent = (moment / hardCodeDuration) * 100;
     return `${percent}%`
   }
 
+  useEffect(() => {
+    if (wavesurfer && currentTrack.isPlaying) {
+      wavesurfer.pause();
+    }
+  }, [currentTrack])
+
+  useEffect(() => {
+    if (track?._id && !currentTrack?._id) {
+      setCurrentTrack({ ...track, isPlaying: false });
+    }
+  }, [track])
+
+  const handleIncreaseView = async () => {
+    if (firstViewRef.current) {
+      const res2 = await sendRequest<IBackendRes<IModelPaginate<ITrackLike>>>({
+        url: `http://localhost:8000/api/v1/tracks/increase-view`,
+        method: 'POST',
+        body: {
+          trackId: track?._id,
+        }
+      })
+      router.refresh()
+      firstViewRef.current = false;
+    }
+
+  }
   return (
     <div style={{ marginTop: 20 }}>
       <div
@@ -150,7 +193,17 @@ const WaveTrack = () => {
           <div className="info" style={{ display: "flex" }}>
             <div>
               <div
-                onClick={() => onPlayClick()}
+                onClick={() => {
+                  onPlayClick()
+                  handleIncreaseView()
+                  if (track && wavesurfer) {
+                    setCurrentTrack({
+                      ...currentTrack,
+                      isPlaying: false,
+                    })
+                  }
+
+                }}
                 style={{
                   borderRadius: "50%",
                   background: "#f50",
@@ -181,7 +234,7 @@ const WaveTrack = () => {
                 width: "fit-content",
                 color: "white"
               }}>
-                Hỏi Dân IT's song
+                {track?.title}
               </div>
               <div style={{
                 padding: "0 5px",
@@ -192,7 +245,7 @@ const WaveTrack = () => {
                 color: "white"
               }}
               >
-                Eric
+                {track?.description}
               </div>
             </div>
           </div>
@@ -214,24 +267,26 @@ const WaveTrack = () => {
               style={{ position: "relative" }}
             >
               {
-                arrComments.map(item => {
+                comments?.map(item => {
                   return (
-                    <Tooltip title={`${item.user} - ${item.content}`} arrow>
-                      <img
+                    <Tooltip title={`${item.content}`} arrow key={item._id}>
+                      <Image
                         onPointerMove={(e) => {
                           const hover = hoverRef.current!;
                           hover.style.width = calLeft(item.moment);
                         }}
-                        key={item.id}
+                        src={fetchDefaultImages(item.user.type)}
+                        alt="user-comment"
+                        height={20}
+                        width={20}
                         style={{
-                          height: 20, width: 20,
                           position: "absolute",
                           top: 71,
                           zIndex: 20,
                           left: calLeft(item.moment)
                         }}
-                        src={`http://localhost:8000/images/chill1.png`}
                       />
+
                     </Tooltip>
                   )
                 })
@@ -247,13 +302,29 @@ const WaveTrack = () => {
             alignItems: "center"
           }}
         >
-          <div style={{
-            background: "#ccc",
-            width: 250,
-            height: 250
-          }}>
-          </div>
+          {
+            track?.imgUrl ?
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/images/${track?.imgUrl}`}
+                width={250}
+                height={250}
+                alt="track image"
+              />
+              :
+              <div style={{
+                background: "#ccc",
+                width: 250,
+                height: 250
+              }}>
+              </div>
+          }
         </div>
+      </div>
+      <div>
+        <LikeTrack track={track} />
+      </div>
+      <div>
+        <CommentTrack comments={comments} track={track} wavesurfer={wavesurfer} />
       </div>
     </div >
   )
