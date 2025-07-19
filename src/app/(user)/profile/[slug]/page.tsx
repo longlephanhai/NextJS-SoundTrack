@@ -9,7 +9,10 @@ const ProfileUserPage = async ({ params }: { params: { slug: string } }) => {
   const data = await sendRequest({
     url: "http://localhost:8000/api/v1/tracks/users?current=1&pageSize=10",
     method: "POST",
-    body: { id: slug }
+    body: { id: slug },
+    nextOption: {
+      next: { tags: ['track-by-profile'] }
+    }
   })
 
   //@ts-ignore

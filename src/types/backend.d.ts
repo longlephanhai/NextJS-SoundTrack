@@ -91,4 +91,8 @@ declare global {
         createdAt: string;
         updatedAt: string;
     }
+
+    interface IPlaylist {
+        
+    }
 }

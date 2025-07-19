@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation'
 import { useSession, signIn, signOut } from "next-auth/react"
 import { fetchDefaultImages } from '@/utils/api';
 import Image from 'next/image';
+import ActiveLink from './active.link';
 
 
 const Search = styled('div')(({ theme }) => ({
@@ -208,6 +209,12 @@ export default function AppHeader() {
               <StyledInputBase
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
+                onKeyDown={(e: any) => {
+                  if (e.key === "Enter") {
+                    if (e?.target?.value)
+                      router.push(`/search?q=${e?.target?.value}`)
+                  }
+                }}
               />
             </Search>
 
@@ -220,14 +227,19 @@ export default function AppHeader() {
               "> a": {
                 color: 'unset',
                 textDecoration: 'none',
+                "&.active": {
+                  background: "#3b4a59",
+                  color: "#cefaff",
+                  borderRadius: "5px",
+                }
               }
             }}>
               {
                 session ?
                   <>
-                    <Link href={'/playlist'}>PlayLists</Link>
-                    <Link href={'/like'}>Likes</Link>
-                    <Link href={'/track/upload'}>Upload</Link>
+                    <ActiveLink href={'/playlist'}>PlayLists</ActiveLink>
+                    <ActiveLink href={'/like'}>Likes</ActiveLink>
+                    <ActiveLink href={'/track/upload'}>Upload</ActiveLink>
                     <Image
                       src={fetchDefaultImages(session.user.type)}
                       alt="avatar"

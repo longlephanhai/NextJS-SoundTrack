@@ -158,11 +158,20 @@ const WaveTrack = (props: IProps) => {
 
   const handleIncreaseView = async () => {
     if (firstViewRef.current) {
-      const res2 = await sendRequest<IBackendRes<IModelPaginate<ITrackLike>>>({
+      await sendRequest<IBackendRes<IModelPaginate<ITrackLike>>>({
         url: `http://localhost:8000/api/v1/tracks/increase-view`,
         method: 'POST',
         body: {
           trackId: track?._id,
+        }
+      })
+      // clear data cache
+      await sendRequest<IBackendRes<any>>({
+        url: `/api/revalidate`,
+        method: 'POST',
+        queryParams: {
+          tag: "track-by-id",
+          secret: "sjvjgewojweoviwevn"
         }
       })
       router.refresh()

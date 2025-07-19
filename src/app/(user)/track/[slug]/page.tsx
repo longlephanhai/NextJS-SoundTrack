@@ -22,6 +22,12 @@ export async function generateMetadata(
   const res = await sendRequest<IBackendRes<ITrackTop>>({
     url: `http://localhost:8000/api/v1/tracks/${id}`,
     method: "GET",
+    nextOption: {
+      // caches: 'no-store',
+      next: {
+        tags: ['track-by-id']
+      }
+    }
   })
 
   return {
